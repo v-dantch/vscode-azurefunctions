@@ -483,6 +483,28 @@
                 "url": "http://json.schemastore.org/proxies"
             }
         ],
+        "taskDefinitions": [
+            {
+                "type": "func",
+                "required": [
+                    "command",
+                    "language"
+                ],
+                "properties": {
+                    "language": {
+                        "type": "string",
+                        "enum": [
+                            "JavaScript",
+                            "Python",
+                            "C#"
+                        ]
+                    },
+                    "command": {
+                        "type": "string"
+                    }
+                }
+            }
+        ],
         "problemPatterns": [
             {
                 "name": "func",

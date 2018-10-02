@@ -39,6 +39,7 @@ import { ext } from './extensionVariables';
 import { installOrUpdateFuncCoreTools } from './funcCoreTools/installOrUpdateFuncCoreTools';
 import { uninstallFuncCoreTools } from './funcCoreTools/uninstallFuncCoreTools';
 import { validateFuncCoreToolsIsLatest } from './funcCoreTools/validateFuncCoreToolsIsLatest';
+import { FuncTaskProvider } from './FuncTaskProvider';
 import { FunctionTemplates, getFunctionTemplates } from './templates/FunctionTemplates';
 import { FunctionAppProvider } from './tree/FunctionAppProvider';
 import { FunctionAppTreeItem } from './tree/FunctionAppTreeItem';
@@ -88,6 +89,8 @@ export function activate(context: vscode.ExtensionContext): void {
         const templatesTask: Promise<void> = getFunctionTemplates().then((templates: FunctionTemplates) => {
             ext.functionTemplates = templates;
         });
+
+        context.subscriptions.push(vscode.workspace.registerTaskProvider('func', new FuncTaskProvider()));
 
         registerCommand('azureFunctions.selectSubscriptions', () => vscode.commands.executeCommand('azure-account.selectSubscriptions'));
         registerCommand('azureFunctions.refresh', async (node?: IAzureNode) => await tree.refresh(node));

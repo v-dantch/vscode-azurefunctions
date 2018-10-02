@@ -26,27 +26,13 @@ export class JavaScriptProjectCreator extends ScriptProjectCreatorBase {
                     type: 'node',
                     request: 'attach',
                     port: 5858,
-                    preLaunchTask: funcHostTaskId
+                    preLaunchTask: 'func: host start'
                 }
             ]
         };
     }
 
     public getTasksJson(runtime: string): {} {
-        let options: ITaskOptions | undefined;
-        // tslint:disable-next-line:no-any
-        const funcTask: any = {
-            label: funcHostTaskLabel,
-            identifier: funcHostTaskId,
-            type: 'shell',
-            command: 'func host start',
-            isBackground: true,
-            presentation: {
-                reveal: 'always'
-            },
-            problemMatcher: funcWatchProblemMatcher
-        };
-
         const installExtensionsTask: {} = {
             label: installExtensionsId, // Until this is fixed, the label must be the same as the id: https://github.com/Microsoft/vscode/issues/57707
             identifier: installExtensionsId,
@@ -58,17 +44,9 @@ export class JavaScriptProjectCreator extends ScriptProjectCreatorBase {
         };
 
         // tslint:disable-next-line:no-unsafe-any
-        const tasks: {}[] = [funcTask];
+        const tasks: {}[] = [];
 
         if (runtime !== ProjectRuntime.v1) {
-            options = {};
-            options.env = {};
-            options.env[funcNodeDebugEnvVar] = funcNodeDebugArgs;
-            // tslint:disable-next-line:no-unsafe-any
-            funcTask.options = options;
-
-            // tslint:disable-next-line:no-unsafe-any
-            funcTask.dependsOn = installExtensionsId;
             this.preDeployTask = installExtensionsId;
             tasks.push(installExtensionsTask);
         }
