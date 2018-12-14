@@ -7,7 +7,7 @@ import * as unixPsTree from 'ps-tree';
 import * as vscode from 'vscode';
 import { IActionContext, UserCancelledError } from 'vscode-azureextensionui';
 import { extensionPrefix, isWindows } from '../constants';
-import { funcHostTaskLabel, isFuncHostTask, stopFuncHostPromise } from '../funcCoreTools/funcHostTask';
+import { isFuncHostTask, stopFuncHostPromise } from '../funcCoreTools/funcHostTask';
 import { validateFuncCoreToolsInstalled } from '../funcCoreTools/validateFuncCoreToolsInstalled';
 import { localize } from '../localize';
 import { getFuncExtensionSetting } from '../ProjectSettings';
@@ -23,7 +23,7 @@ export async function pickFuncProcess(this: IActionContext): Promise<string | un
     const tasks: vscode.Task[] = await vscode.tasks.fetchTasks();
     const funcTask: vscode.Task | undefined = tasks.find(isFuncHostTask);
     if (!funcTask) {
-        throw new Error(localize('noFuncTask', 'Failed to find task with label "{0}".', funcHostTaskLabel));
+        throw new Error(localize('noFuncTask', 'Failed to find task with label "{0}".', 'todo'));
     }
 
     const settingKey: string = 'pickProcessTimeout';

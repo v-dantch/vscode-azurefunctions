@@ -3,11 +3,8 @@
  *  Licensed under the MIT License. See License.txt in the project root for license information.
  *--------------------------------------------------------------------------------------------*/
 
-import { installExtensionsId, ProjectRuntime, TemplateFilter } from "../../constants";
-import { funcHostCommand, funcHostTaskLabel } from "../../funcCoreTools/funcHostTask";
+import { extInstallTaskName, func, funcWatchProblemMatcher, hostStartCommand, hostStartTaskName, ProjectRuntime, TemplateFilter } from "../../constants";
 import { localize } from "../../localize";
-import { ITaskOptions } from "./ITasksJson";
-import { funcWatchProblemMatcher } from "./ProjectCreatorBase";
 import { ScriptProjectCreatorBase } from './ScriptProjectCreatorBase';
 
 export const funcNodeDebugArgs: string = '--inspect=5858';
@@ -31,43 +28,28 @@ export class JavaScriptProjectCreator extends ScriptProjectCreatorBase {
                     type: 'node',
                     request: 'attach',
                     port: 5858,
-                    preLaunchTask: funcHostTaskLabel
+                    preLaunchTask: hostStartTaskName
                 }
             ]
         };
     }
 
     public getTasksJson(): {} {
-        let options: ITaskOptions | undefined;
         // tslint:disable-next-line:no-any
         const funcTask: any = {
-            label: funcHostTaskLabel,
-            type: 'shell',
-            command: funcHostCommand,
-            isBackground: true,
-            problemMatcher: funcWatchProblemMatcher
-        };
-
-        const installExtensionsTask: {} = {
-            label: installExtensionsId,
-            command: 'func extensions install',
-            type: 'shell'
+            type: func,
+            command: hostStartCommand,
+            problemMatcher: funcWatchProblemMatcher,
+            isBackground: true
         };
 
         // tslint:disable-next-line:no-unsafe-any
         const tasks: {}[] = [funcTask];
 
         if (this.runtime !== ProjectRuntime.v1) {
-            options = {};
-            options.env = {};
-            options.env[funcNodeDebugEnvVar] = funcNodeDebugArgs;
             // tslint:disable-next-line:no-unsafe-any
-            funcTask.options = options;
-
-            // tslint:disable-next-line:no-unsafe-any
-            funcTask.dependsOn = installExtensionsId;
-            this.preDeployTask = installExtensionsId;
-            tasks.push(installExtensionsTask);
+            funcTask.dependsOn = extInstallTaskName;
+            this.preDeployTask = extInstallTaskName;
         }
 
         return {

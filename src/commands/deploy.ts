@@ -12,7 +12,7 @@ import * as path from 'path';
 import * as vscode from 'vscode';
 import * as appservice from 'vscode-azureappservice';
 import { AzureTreeItem, DialogResponses, IActionContext, IAzureUserInput, TelemetryProperties, UserCancelledError } from 'vscode-azureextensionui';
-import { deploySubpathSetting, extensionPrefix, funcPackId, installExtensionsId, preDeployTaskSetting, ProjectLanguage, ProjectRuntime, publishTaskId, ScmType } from '../constants';
+import { deploySubpathSetting, extensionPrefix, extInstallTaskName, funcPackId, preDeployTaskSetting, ProjectLanguage, ProjectRuntime, publishTaskId, ScmType } from '../constants';
 import { ArgumentError } from '../errors';
 import { ext } from '../extensionVariables';
 import { addLocalFuncTelemetry } from '../funcCoreTools/getLocalFuncCoreToolsVersion';
@@ -297,7 +297,7 @@ async function runPreDeployTask(deployFsPath: string, telemetryProperties: Telem
                 if (runtime === ProjectRuntime.v1) {
                     return; // "func extensions install" is only supported on v2
                 } else {
-                    taskName = installExtensionsId;
+                    taskName = extInstallTaskName;
                 }
                 break;
             case ProjectLanguage.Python:

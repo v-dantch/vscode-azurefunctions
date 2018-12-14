@@ -9,14 +9,13 @@ import * as os from 'os';
 import * as path from 'path';
 import { InputBoxOptions, window } from 'vscode';
 import { IActionContext } from "vscode-azureextensionui";
-import { ProjectRuntime, TemplateFilter } from '../../constants';
+import { func, funcWatchProblemMatcher, hostStartCommand, hostStartTaskName, ProjectRuntime, TemplateFilter } from '../../constants';
 import { ext } from '../../extensionVariables';
-import { funcHostTaskLabel } from "../../funcCoreTools/funcHostTask";
 import { localize } from "../../localize";
 import * as fsUtil from '../../utils/fs';
 import { validateMavenIdentifier, validatePackageName } from '../../utils/javaNameUtils';
 import { mavenUtils } from '../../utils/mavenUtils';
-import { funcWatchProblemMatcher, ProjectCreatorBase } from './ProjectCreatorBase';
+import { ProjectCreatorBase } from './ProjectCreatorBase';
 
 export class JavaProjectCreator extends ProjectCreatorBase {
     public readonly templateFilter: TemplateFilter = TemplateFilter.Verified;
@@ -113,23 +112,24 @@ export class JavaProjectCreator extends ProjectCreatorBase {
     }
 
     public getTasksJson(): {} {
+        const clean: string = 'clean';
         return {
             version: '2.0.0',
             tasks: [
                 {
-                    label: funcHostTaskLabel,
-                    linux: {
-                        command: `sh -c "mvn clean package -B && func host start --language-worker -- \\\"-agentlib:jdwp=transport=dt_socket,server=y,suspend=n,address=5005\\\" --script-root \\\"${this._javaTargetPath}\\\""`
-                    },
-                    osx: {
-                        command: `sh -c "mvn clean package -B && func host start --language-worker -- \\\"-agentlib:jdwp=transport=dt_socket,server=y,suspend=n,address=5005\\\" --script-root \\\"${this._javaTargetPath}\\\""`
-                    },
-                    windows: {
-                        command: `powershell -command "mvn clean package -B; func host start --language-worker -- \\\"-agentlib:jdwp=transport=dt_socket,server=y,suspend=n,address=5005\\\" --script-root \\\"${this._javaTargetPath}\\\""`
-                    },
-                    type: 'shell',
+                    type: func,
+                    command: hostStartCommand,
+                    problemMatcher: funcWatchProblemMatcher,
                     isBackground: true,
-                    problemMatcher: funcWatchProblemMatcher
+                    options: {
+                        cwd: `\${workspaceFolder}/${this._javaTargetPath}`
+                    },
+                    dependsOn: clean
+                },
+                {
+                    label: clean,
+                    command: `mvn clean package -B`,
+                    type: 'shell'
                 }
             ]
         };
@@ -145,7 +145,7 @@ export class JavaProjectCreator extends ProjectCreatorBase {
                     request: 'attach',
                     hostName: 'localhost',
                     port: 5005,
-                    preLaunchTask: funcHostTaskLabel
+                    preLaunchTask: hostStartTaskName
                 }
             ]
         };

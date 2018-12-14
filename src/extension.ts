@@ -42,11 +42,13 @@ import { restartFunctionApp } from './commands/restartFunctionApp';
 import { startFunctionApp } from './commands/startFunctionApp';
 import { stopFunctionApp } from './commands/stopFunctionApp';
 import { swapSlot } from './commands/swapSlot';
+import { func } from './constants';
 import { ext } from './extensionVariables';
 import { registerFuncHostTaskEvents } from './funcCoreTools/funcHostTask';
 import { installOrUpdateFuncCoreTools } from './funcCoreTools/installOrUpdateFuncCoreTools';
 import { uninstallFuncCoreTools } from './funcCoreTools/uninstallFuncCoreTools';
 import { validateFuncCoreToolsIsLatest } from './funcCoreTools/validateFuncCoreToolsIsLatest';
+import { FuncTaskProvider } from './FuncTaskProvider';
 import { getTemplateProvider } from './templates/TemplateProvider';
 import { FunctionAppProvider } from './tree/FunctionAppProvider';
 import { FunctionTreeItem } from './tree/FunctionTreeItem';
@@ -128,6 +130,8 @@ export async function activate(context: vscode.ExtensionContext): Promise<AzureE
         registerCommand('azureFunctions.swapSlot', swapSlot);
         registerCommand('azureFunctions.createSlot', async (node?: AzureParentTreeItem) => await createChildNode(SlotsTreeItem.contextValue, node));
         registerFuncHostTaskEvents();
+
+        context.subscriptions.push(vscode.workspace.registerTaskProvider(func, new FuncTaskProvider()));
     });
 
     return createApiProvider([]);
